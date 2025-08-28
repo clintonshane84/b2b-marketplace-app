@@ -1,61 +1,204 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# B2B Marketplace – Rankings Service
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This repository contains the **Rankings Service** for the B2B Marketplace.  
+It powers the **Agency Rankings** feature that allows brands to view and compare agencies based on expertise, reviews, awards, and performance indicators.
 
-## About Laravel
+Built with **Laravel 11**, this service follows **DDD + Hexagonal Architecture** to keep the domain pure, infrastructure swappable, and adapters testable.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## ✨ Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Agency Rankings**  
+  Weighted scoring model using reviews, awards, response time, case studies, and budget fit.
 
-## Learning Laravel
+- **Domain-Driven Design**  
+  Clear separation of **Domain**, **Application**, **Infrastructure**, and **Adapters**.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- **Extensible**  
+  Shared libraries live under `src/B2BMarketplace`, PSR-4 autoloaded, and reusable across services.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- **Contracts First**  
+  - Public HTTP API documented in `openapi/rankings.yaml`  
+  - Event contracts (JSON Schema) in `contracts/events/`
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- **Production Ready**  
+  - Dockerized PHP + Nginx + Horizon  
+  - Configurable observability (OTEL, FluentBit)  
+  - Makefile targets for local dev & CI  
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 📂 Project Structure
 
-### Premium Partners
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+.
+├── app/
+│   ├── Domain/           # Entities, DTOs, Contracts, Policies
+│   ├── Application/      # Use cases & orchestrators
+│   ├── Infrastructure/   # DB, cache, messaging, external APIs
+│   ├── Http/             # Controllers, Requests, Resources
+│   ├── Console/          # Artisan commands
+│   ├── Jobs/             # Queue jobs & message consumers
+│   └── Providers/        # Service providers (DI bindings)
+├── src/B2BMarketplace/   # Shared libraries (PSR-4)
+├── config/               # Service config (rankings, telemetry, clients…)
+├── database/             # Migrations, seeders, factories
+├── routes/               # API & console route definitions
+├── tests/                # Unit, Feature, Integration, Contract tests
+├── openapi/              # API spec (OpenAPI YAML)
+├── contracts/            # Async schemas (events)
+├── docker/               # Dockerfiles & configs
+├── deploy/               # Deployment manifests (K8s/ECS)
+├── ops/                  # Observability configs
+└── Makefile              # Common dev commands
 
-## Contributing
+````
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## 🚀 Getting Started
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Prerequisites
+- PHP 8.2+
+- Composer 2.x
+- Docker + Docker Compose
+- Node.js (optional, for frontend tooling)
 
-## Security Vulnerabilities
+### Installation
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+# Clone the repo
+git clone git@github.com:clintonshane84/b2b-marketplace-app.git
+cd b2b-marketplace-app
 
-## License
+# Install dependencies
+composer install
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# Copy env
+cp .env.example .env
+
+# Generate app key
+php artisan key:generate
+
+# Run migrations + seed
+php artisan migrate --seed
+````
+
+### Local Development with Docker
+
+```bash
+make up          # start PHP-FPM, Nginx, MySQL, Redis
+make migrate     # run migrations inside container
+make test        # run Pest tests
+make down        # stop containers
+```
+
+---
+
+## 🧩 API
+
+* Base path: `/api/v1`
+* Swagger/OpenAPI spec: [`openapi/rankings.yaml`](./openapi/rankings.yaml)
+
+### Example: Fetch ranked agencies
+
+```http
+GET /api/v1/rankings?country=US&expertise=seo&budget_min=50&budget_max=120
+```
+
+Response (truncated):
+
+```json
+{
+  "data": [
+    {
+      "agency": {
+        "id": "uuid",
+        "name": "Acme SEO",
+        "country": "US",
+        "city": "New York",
+        "verified": true,
+        "review_avg": 4.7,
+        "review_count": 230
+      },
+      "score": 0.8421,
+      "components": {
+        "review_avg": 0.94,
+        "review_count": 0.77,
+        "verified": 1,
+        "awards_recent": 0.8,
+        "case_studies": 0.5,
+        "response_time": 0.9,
+        "budget_fit": 0.7
+      }
+    }
+  ]
+}
+```
+
+---
+
+## 📊 Architecture Overview
+
+* **Domain** – Pure business rules (`App\Domain`)
+* **Application** – Use cases orchestrating domain services (`App\Application`)
+* **Infrastructure** – Adapters to DB, cache, external APIs (`App\Infrastructure`)
+* **Adapters (Inbound)** – Controllers, Commands, Jobs under Laravel defaults
+* **Shared Libs** – `src/B2BMarketplace/Shared` (DTOs, ValueObjects, Contracts)
+
+---
+
+## 🧪 Testing
+
+* **Unit Tests** – Fast, domain-only
+* **Feature Tests** – Controllers, requests, API responses
+* **Integration Tests** – Real DB/cache/queue (Dockerized)
+* **Contract Tests** – Against OpenAPI and event schemas
+
+Run all tests:
+
+```bash
+composer test
+```
+
+---
+
+## ⚙️ Deployment
+
+* **Kubernetes** manifests under `deploy/k8s/`
+* **ECS** task definitions under `deploy/ecs/`
+* **Docker** images defined in `docker/`
+
+CI/CD pipelines should:
+
+1. Run `make test`
+2. Build & push Docker image
+3. Apply infra manifests
+
+---
+
+## 📚 Libraries & Standards
+
+* [Laravel](https://laravel.com/) 11.x
+* [Pest](https://pestphp.com/) for testing
+* [Larastan](https://github.com/nunomaduro/larastan) for static analysis
+* [Laravel Pint](https://laravel.com/docs/pint) for code style
+* [OpenAPI](https://swagger.io/specification/) for API contracts
+
+---
+
+## 🧑‍💻 Contributing
+
+1. Fork & clone
+2. Create a feature branch (`git checkout -b feature/my-feature`)
+3. Run `composer fix && composer test`
+4. Open a Pull Request
+
+---
+
+## 📄 License
+
+Proprietary © Clinton Shane Wright 2025.
+Unauthorized copying, modification, or distribution is prohibited.
